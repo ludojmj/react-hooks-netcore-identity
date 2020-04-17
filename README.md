@@ -4,37 +4,48 @@
 git clone https://github.com/ludojmj/react-hooks-netcore-identity.git
 ```
 
-## They did first
+The aim of this project is to gather in one place the simplest technologies for a CRUD App:
 
-- SQLite database powered by: <https://www.sqlite.org>
-- Server based on API mechanisms of: <https://reqres.in/api/whatever>
-- React client inspired by the work of: [Tania Rascia](https://github.com/taniarascia/react-hooks)
-- Handling data with React Hooks inspired by the work of: [Robin Wieruch](https://github.com/the-road-to-learn-react/react-hooks-introduction)
-- Identity service powered by: <https://demo.identityserver.io>
-- CSS borrowed from: [Raphaël Goetter](https://github.com/alsacreations/KNACSS)
-- SVG borrowed from: <https://creativecommons.org>
+- A Database with SQLite;
+- A CRUD Web API server in .NET Core 3.x;
+- A client App in React with Hooks;
+- The client and the server use an external service for identity management, authorization, and API security.
 
-## In a nutshell
+## Quick start
 
-### .NET Core 3.x Web API server
+Server
 
 ```bash
 cd <myfolder>/Server
 dotnet run
 ```
 
-### React client App
+Client
 
 ```bash
 cd <myfolder>/client
+[run_once] npm install [/run_once]
 npm start
 ```
 
 ---
 
-## All the manufacturing process
+## Inspiration
 
-### **>>>>>** SQLite database
+- SQLite database powered by: <https://www.sqlite.org>
+- Server based on API mechanisms of: <https://reqres.in/api/whatever>
+- React client inspired by the work of: [Tania Rascia](https://github.com/taniarascia/react-hooks)
+- Handling data with React Hooks inspired by the work of: [Robin Wieruch](https://github.com/the-road-to-learn-react/react-hooks-introduction)
+- Identity service powered by: <https://demo.identityserver.io>
+- Identity client borrowed from: [AxaGuilDev](https://github.com/AxaGuilDEv/react-oidc)
+- CSS borrowed from: [Raphaël Goetter](https://github.com/alsacreations/KNACSS)
+- SVG borrowed from: <https://creativecommons.org>
+
+---
+
+## Manufacturing process steps
+
+### >>>>> SQLite database
 
 #### Create the database
 
@@ -43,7 +54,7 @@ cd <myfolder>/Server
 sqlite3 stuff.db < create_tables.sql
 ```
 
-### **>>>>>** .NET Core 3.x Web API server
+### >>>>> .NET Core 3.x Web API server
 
 #### Create the server project
 
@@ -81,7 +92,7 @@ export ASPNETCORE_ENVIRONMENT=Development
 dotnet run
 ```
 
-### **>>>>>** React client App
+### >>>>> React client App
 
 #### Create the client project
 
