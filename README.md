@@ -1,15 +1,16 @@
-# CRUD: React with Hooks, .NET Core 3.x Web API, Identity, SQLite
+# All-In-One CRUD
 
 ```bash
 git clone https://github.com/ludojmj/react-hooks-netcore-identity.git
 ```
 
-The aim of this project is to gather in one place the simplest technologies for a CRUD App:
+Developing a CRUD Web App is just an excuse.  
+The aim of this project is to gather, in a single place, useful front and back ends development tools:
 
 - A Database with SQLite;
-- A CRUD Web API server in .NET Core 3.x;
+- A Web API server with .NET Core 3.x;
 - A client App in React with Hooks;
-- The client and the server use an external service for identity management, authorization, and API security.
+- A link to an external service for identity management, authorization, and API security.
 
 ## Quick start
 
@@ -24,7 +25,7 @@ Client
 
 ```bash
 cd <myfolder>/client
-[run_once] npm install [/run_once]
+npm install
 npm start
 ```
 
@@ -68,7 +69,7 @@ dotnet new xunit -n Server.UnitTest
 #### Generate the model from the database for the Web API server
 
 ```bash
-[run_once] dotnet tool install --global dotnet-ef [/run_once]
+dotnet tool install --global dotnet-ef
 cd <myfolder>/Server
 dotnet ef dbcontext scaffold "Data Source=stuff.db" Microsoft.EntityFrameworkCore.Sqlite \
 --output-dir DbModels --context-dir DbModels --context StuffDbContext --force
