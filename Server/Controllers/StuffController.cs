@@ -5,7 +5,6 @@ using Server.Repository.Interfaces;
 
 namespace Server.Controllers
 {
-    [ApiController]
     [Route("api/[controller]")]
     public class StuffController : ControllerBase
     {
