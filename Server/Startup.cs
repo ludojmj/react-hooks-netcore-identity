@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -51,7 +52,6 @@ namespace Server
 
             services.AddMvc(options =>
             {
-                options.Filters.Add(typeof(ErrorHandlerFilter));
                 options.Filters.Add(typeof(ModelValidationFilter));
             }).SetCompatibilityVersion(CompatibilityVersion.Latest);
 
@@ -71,7 +71,7 @@ namespace Server
             services.AddHttpsRedirection(options =>
             {
                 options.RedirectStatusCode = StatusCodes.Status308PermanentRedirect;
-                options.HttpsPort = int.Parse(_conf["https_port"]);
+                options.HttpsPort = 443;
             });
 
             // Register the Swagger generator
@@ -112,6 +112,33 @@ namespace Server
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app)
         {
+            if (_env.IsDevelopment())
+            {
+                app.UseCors(options => options.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
+            }
+            else
+            {
+                var corsList = _conf["AuthCors"].Split(" ");
+                app.UseCors(builder => builder
+                    .WithOrigins(corsList)
+                    .AllowAnyMethod()
+                    .AllowAnyHeader()
+                );
+            }
+
+            // React hosted by Web API ==> ignoring React for auth
+            // - /authentication/callback
+            // - /authentication/silent_callback
+            app.Use(async (context, next) =>
+            {
+                await next();
+                if (context.Response.StatusCode == 404 && !Path.HasExtension(context.Request.Path.Value))
+                {
+                    context.Request.Path = new PathString("/index.html");
+                    await next();
+                }
+            });
+
             app.UseFileServer(new FileServerOptions
             {
                 EnableDirectoryBrowsing = false,
@@ -119,12 +146,14 @@ namespace Server
                 DefaultFilesOptions = { DefaultFileNames = { "index.html" } }
             });
 
-            app.UseSwagger();
-
-            app.UseSwaggerUI(c =>
+            if (!_env.IsProduction())
             {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Server V1");
-            });
+                app.UseSwagger();
+                app.UseSwaggerUI(c =>
+                {
+                    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Server V1");
+                });
+            }
 
             app.Use(async (context, next) =>
             {
@@ -135,24 +164,15 @@ namespace Server
                 context.Response.Headers.Add("X-XSS-Protection", "1; mode=block");
                 context.Response.Headers.Add("Referrer-Policy", "no-referrer");
                 context.Response.Headers.Add("X-Content-Type-Options", "nosniff");
-                context.Response.Headers.Add("X-Frame-Options", "DENY");
-                context.Response.Headers.Add("Content-Security-Policy", "frame-ancestors 'none'");
+                context.Response.Headers.Add("X-Frame-Options", "SAMEORIGIN");
+                context.Response.Headers.Add("Content-Security-Policy", "frame-ancestors 'self'");
                 await next();
             });
 
+            app.UseExceptionHandler("/api/Error");
             app.UseHsts();
             app.UseHttpsRedirection();
             app.UseRouting();
-
-            if (_env.IsDevelopment())
-            {
-                app.UseCors(builder => builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
-            }
-            else
-            {
-                app.UseCors();
-            }
-
             app.UseAuthentication();
             app.UseAuthorization();
             app.UseEndpoints(endpoints =>

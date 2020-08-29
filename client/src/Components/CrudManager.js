@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { NavLink } from 'react-router-dom';
 import { useReactOidc } from "@axa-fr/react-oidc-context";
 
+import Header from './Header';
 import Error from './Error';
 import StuffCreate from './StuffCreate';
 import StuffRead from './StuffRead';
@@ -30,7 +30,6 @@ const CrudManager = () => {
 
   // Auth
   const { oidcUser } = useReactOidc();
-  const { profile } = oidcUser ? oidcUser : { profile: { sub: "?", name: "?" } };
   const httpHeaders = { Authorization: oidcUser ? `Bearer ${oidcUser.access_token}` : "NoAuth" };
 
   // API
@@ -162,39 +161,36 @@ const CrudManager = () => {
   if (deleting) { return <StuffDelete isOpen={deleting} onSubmit={deleteStuff} currentDatum={currentDatum} closeModal={closeModal} /> }
 
   return (
-    <div className="w60 center">
-      <div className="txtright">
-        <NavLink to="/">
-          <span className="btn--inverse">{profile.name}</span>
-        </NavLink>
+    <div>
+      <Header />
+      <div className="w60 center">
+        <form onSubmit={handleSearch} className="autogrid has-gutter-l">
+          <input
+            autoFocus
+            type="text"
+            maxLength="20"
+            name="filter"
+            placeholder="Filter"
+            value={search.filter}
+            onChange={handleChangeFilter}
+          />
+          <button className="btn--primary">Search</button>
+          <button className="btn--info" onClick={handleReset}>Reset</button>
+          <div>
+            <button className="badge--primary" value="-" onClick={handlePage} disabled={stuff.page === 1 && "disabled"}><i className="icon-arrow--left" /></button>
+            <span className="tag--warning nowrap">Page {stuff.page}/{stuff.totalPages}</span>
+            <button className="badge--primary" value="+" onClick={handlePage} disabled={stuff.page === stuff.totalPages && "disabled"}><i className="icon-arrow--right" /></button>
+          </div>
+          <button className="btn--success" onClick={handleCreate}>Create</button>
+        </form>
+
+        <StuffList
+          currentUserId={oidcUser.profile.sub}
+          datumList={stuff.datumList}
+          handleRead={handleRead}
+          handleUpdate={handleUpdate}
+          handleDelete={handleDelete} />
       </div>
-
-      <form onSubmit={handleSearch} className="autogrid has-gutter-l">
-        <input
-          autoFocus
-          type="text"
-          maxLength="20"
-          name="filter"
-          placeholder="Filter"
-          value={search.filter}
-          onChange={handleChangeFilter}
-        />
-        <button className="btn--primary">Search</button>
-        <button className="btn--info" onClick={handleReset}>Reset</button>
-        <div>
-          <button className="badge--primary" value="-" onClick={handlePage} disabled={stuff.page === 1 && "disabled"}><i className="icon-arrow--left" /></button>
-          <span className="tag--warning nowrap">Page {stuff.page}/{stuff.totalPages}</span>
-          <button className="badge--primary" value="+" onClick={handlePage} disabled={stuff.page === stuff.totalPages && "disabled"}><i className="icon-arrow--right" /></button>
-        </div>
-        <button className="btn--success" onClick={handleCreate}>Create</button>
-      </form>
-
-      <StuffList
-        currentUserId={oidcUser.profile.sub}
-        datumList={stuff.datumList}
-        handleRead={handleRead}
-        handleUpdate={handleUpdate}
-        handleDelete={handleDelete} />
     </div>
   );
 }

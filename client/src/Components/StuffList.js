@@ -24,18 +24,14 @@ const StuffList = props => {
               <td data-label="createdAt">{datum.createdAt ? <code>{new Date(datum.createdAt).toLocaleString()}</code> : "-"}</td>
               <td data-label="updatedAt">{datum.updatedAt ? <code>{new Date(datum.updatedAt).toLocaleString()}</code> : "-"}</td>
               <td><button className="btn--success" value={datum.id} onClick={() => props.handleRead(datum)}>Read</button></td>
-              <td>
-                {datum.user.id === props.currentUserId ?
-                  <button className="btn--warning" value={datum.id} onClick={() => props.handleUpdate(datum)}>Update</button>
-                  :
-                  <code className="fr">{datum.user.givenName}</code>}
-              </td>
-              <td>
-                {datum.user.id === props.currentUserId ?
-                  <button className="btn--danger" onClick={() => props.handleDelete(datum)}>Delete</button>
-                  :
-                  <code>{datum.user.familyName}</code>}
-              </td>
+              {datum.user.id === props.currentUserId
+                ?
+                <>
+                  <td><button className="btn--warning" value={datum.id} onClick={() => props.handleUpdate(datum)}>Update</button></td>
+                  <td><button className="btn--danger" onClick={() => props.handleDelete(datum)}>Delete</button></td>
+                </>
+                :
+                <td colSpan="2">Owned by: <code>{datum.user.givenName} {datum.user.familyName}</code></td>}
             </tr>
           )
         })}
