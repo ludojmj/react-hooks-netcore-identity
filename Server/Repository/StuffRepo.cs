@@ -81,7 +81,7 @@ namespace Server.Repository
                 dbStuff.StfUser = dbUserAuth;
             }
 
-            // Join user id without updated the user (except if created before)
+            // Attach foreign key
             dbStuff.StfUserId = dbUserAuth.UsrId;
             // Create stuff
             await _context.TStuff.AddAsync(dbStuff);
@@ -124,10 +124,8 @@ namespace Server.Repository
                 throw new ArgumentException("Corrupted data.");
             }
 
-            dbStuff = input.ToUpdate(dbStuff);
-            // Join user id without updated the user
-            dbStuff.StfUserId = dbUserAuth.UsrId;
             // Update stuff
+            dbStuff = input.ToUpdate(dbStuff);
             await _context.SaveChangesAsync();
             // Attach user to the stuff for the response
             dbStuff.StfUser = dbUserAuth;
