@@ -4,7 +4,7 @@
 git clone https://github.com/ludojmj/react-hooks-netcore-identity.git
 ```
 
-Developing a CRUD Web App is just an excuse.  
+Developing a CRUD Web App is just an excuse.
 The aim of this project is to gather, in a single place, useful front and back ends development tools:
 
 - A Database with SQLite;
@@ -48,11 +48,11 @@ npm start
 
 ### >>>>> SQLite database
 
-#### Create the database
+#### Overwrite database if needed
 
 ```bash
-cd <myfolder>/Server
-sqlite3 stuff.db < create_tables.sql
+cd <myfolder>
+sqlite3 Server/App_Data/stuff.db < Server/App_Data/create_tables.sql
 ```
 
 ### >>>>> .NET Core 3.x Web API server
@@ -71,7 +71,7 @@ dotnet new xunit -n Server.UnitTest
 ```bash
 dotnet tool install --global dotnet-ef
 cd <myfolder>/Server
-dotnet ef dbcontext scaffold "Data Source=stuff.db" Microsoft.EntityFrameworkCore.Sqlite \
+dotnet ef dbcontext scaffold "Data Source=App_Data/stuff.db" Microsoft.EntityFrameworkCore.Sqlite \
 --output-dir DbModels --context-dir DbModels --context StuffDbContext --force
 ```
 
@@ -124,38 +124,61 @@ must be:
 
 ## Troubleshooting
 
+### _An error occured. Please try again later._
+
+**When?**
+
+- Creating a record in the SQLite database _stuff.db_ running Linux on Azure;
+- The "real" error (not displayed in Production) is: _SQLite Error 5: 'database is locked'_;
+- There is a restricted write access to the file on Linux web app when running on Azure.
+
+**How to solve:**
+
+- ==> Either use a real database or deploy the web app on Azure choosing Windows OS.
+
 ### _SQLite Error 1: 'no such table: t_stuff'_
 
 **When?**
 
-- Running the React client App (```npm start```)
-- Connecting to: <http://localhost:3000/>
+- Running the React client App (```npm start```);
+- Connecting to: <http://localhost:3000/>.
 
 **How to solve:**
 
-==> Create the Database _stuff.db_ (```sqlite3 Server/stuff.db < Server/create_tables.sql```).
+- ==> Create the database _stuff.db_ (```sqlite3 Server/App_Data/stuff.db < Server/App_Data/create_tables.sql```).
 
 ### _Network Error_
 
 **When?**
 
-- Running the React client App (```npm start```)
-- Connecting to: <http://localhost:3000/>
+- Running the React client App (```npm start```);
+- Connecting to: <http://localhost:3000/>.
 
 **How to solve:**
 
-==> Start the .NET Core server (```dotnet run```) before the React client App (```npm start```).
+- ==> Start the .NET Core server (```dotnet run```) before the React client App (```npm start```).
 
 ### _Your connection is not private_ (NET::ERR_CERT_AUTHORITY_INVALID)
 
 **When?**
 
-- Running the .NET Core server (dotnet run)
-- Connecting to: <http://localhost:5000/swagger>
-- Or connecting to its redirection: <https://localhost:5001/swagger>
+- Running the .NET Core server (dotnet run);
+- Connecting to: <http://localhost:5000/swagger>;
+- Or connecting to its redirection: <https://localhost:5001/swagger>.
 
 **How to solve:**
 
-==> Click "Advanced settings" button;  
-==> Click on the link to continue to the assumed unsafe localhost site;  
-==> Accept self-signed localhost certificate.
+- ==> Click "Advanced settings" button;
+- ==> Click on the link to continue to the assumed unsafe localhost site;
+- ==> Accept self-signed localhost certificate.
+
+### _You do not have permission to view this directory or page._
+
+**When?**
+
+- Browsing the web site on a Azure Windows instance.
+
+**How to solve:**
+
+- ==> Add the Web.config file;
+- ==> The Web.config file is not needed on Linux.
