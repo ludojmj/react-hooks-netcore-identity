@@ -134,7 +134,7 @@ must be:
 
 **How to solve:**
 
-==> Either use a real database or deploy the web app on Azure choosing Windows OS.
+- ==> Either use a real database or deploy the web app on Azure choosing Windows OS.
 
 ### _SQLite Error 1: 'no such table: t_stuff'_
 
