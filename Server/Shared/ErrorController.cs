@@ -2,10 +2,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
-using Server.Models;
-using Server.ErrorHandling;
 
-namespace Server.Controllers
+namespace Server.Shared
 {
     [Route("api/[controller]")]
     [ApiExplorerSettings(IgnoreApi = true)]

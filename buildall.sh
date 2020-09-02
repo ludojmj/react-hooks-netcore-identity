@@ -16,6 +16,12 @@ mv -f build ../Server/
 mv ../Server/build ../Server/wwwroot
 
 let "step++"
+printf "\n************************** $step/$STEPS : Testing server...\n"
+pwd
+cd ../Server.UnitTest
+dotnet test
+
+let "step++"
 printf "\n************************** $step/$STEPS : Building server...\n"
 cd ../Server
 dotnet build --configuration Release

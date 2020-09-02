@@ -7,10 +7,10 @@ using Microsoft.EntityFrameworkCore;
 using Moq;
 using Xunit;
 using Server.DbModels;
-using Server.ErrorHandling;
 using Server.Models;
 using Server.Repository;
 using Server.Repository.Interfaces;
+using Server.Shared;
 
 namespace Server.UnitTest.Repository
 {
@@ -66,7 +66,7 @@ namespace Server.UnitTest.Repository
                 .Options;
             _context = new StuffDbContext(options);
             _context.Database.EnsureCreated();
-            var mockAuth = Mock.Of<IUserAuthRepo>(x => x.GetCurrentUserAsync() == Task.FromResult(_dbUser));
+            var mockAuth = Mock.Of<IUserAuthRepo>(x => x.GetCurrentUserAsync(It.IsAny<string>()) == Task.FromResult(_dbUser));
             _stuffRepo = new StuffRepo(_context, mockAuth);
         }
 
@@ -267,7 +267,7 @@ namespace Server.UnitTest.Repository
         }
 
         [Fact]
-        public async Task StuffRepo_UpdateAsync_ShouldThrow_ArgumentException2()
+        public async Task StuffRepo_UpdateAsync_ShouldThrow_ArgumentException()
         {
             // Arrange1
             // _datumModelTest.Id != input.Id

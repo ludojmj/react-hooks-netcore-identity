@@ -1,4 +1,4 @@
-namespace Server.Models
+namespace Server.Shared
 {
     public class ErrorModel
     {

@@ -3,7 +3,7 @@ const configuration = {
     {
       origin: 'http://localhost:3000',
       config: {
-        client_id: 'interactive.public.short',
+        client_id: 'interactive.public',
         redirect_uri: 'http://localhost:3000/authentication/callback',
         response_type: 'code',
         post_logout_redirect_uri: 'http://localhost:3000/',
@@ -17,7 +17,7 @@ const configuration = {
     {
       origin: 'https://localhost:5001',
       config: {
-        client_id: 'interactive.public.short',
+        client_id: 'interactive.public',
         redirect_uri: 'https://localhost:5001/authentication/callback',
         response_type: 'code',
         post_logout_redirect_uri: 'https://localhost:5001/',
@@ -31,7 +31,7 @@ const configuration = {
     {
       origin: 'https://rita.azurewebsites.net',
       config: {
-        client_id: 'interactive.public.short',
+        client_id: 'interactive.public',
         redirect_uri: 'https://rita.azurewebsites.net/authentication/callback',
         response_type: 'code',
         post_logout_redirect_uri: 'https://rita.azurewebsites.net/',
@@ -45,7 +45,7 @@ const configuration = {
     {
       origin: 'https://ludal.azurewebsites.net',
       config: {
-        client_id: 'interactive.public.short',
+        client_id: 'interactive.public',
         redirect_uri: 'https://ludal.azurewebsites.net/authentication/callback',
         response_type: 'code',
         post_logout_redirect_uri: 'https://ludal.azurewebsites.net/',

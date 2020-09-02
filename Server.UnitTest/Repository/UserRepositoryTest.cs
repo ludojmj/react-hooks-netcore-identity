@@ -51,7 +51,7 @@ namespace Server.UnitTest.Repository
             _context = new StuffDbContext(options);
             _context.Database.EnsureCreated();
 
-            var mockAuth = Mock.Of<IUserAuthRepo>(x => x.GetCurrentUserAsync() == Task.FromResult(_dbUser));
+            var mockAuth = Mock.Of<IUserAuthRepo>(x => x.GetCurrentUserAsync(It.IsAny<string>()) == Task.FromResult(_dbUser));
             _userRepo = new UserRepo(_context, mockAuth);
         }
 
@@ -103,7 +103,7 @@ namespace Server.UnitTest.Repository
             var dbUserList = new List<TUser>();
             for (int idx = 0; idx < 7; idx++)
             {
-                var tpmUser = new TUser {UsrId = _dbUser.UsrId + idx, UsrGivenName = _dbUser.UsrGivenName + idx};
+                var tpmUser = new TUser { UsrId = _dbUser.UsrId + idx, UsrGivenName = _dbUser.UsrGivenName + idx };
                 dbUserList.Add(tpmUser);
             }
 

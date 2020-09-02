@@ -3,9 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Server.Models;
 
-namespace Server.ErrorHandling
+namespace Server.Shared
 {
     public class ErrorHandlerFilter : IExceptionFilter
     {
