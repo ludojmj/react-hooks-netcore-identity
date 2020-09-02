@@ -5,6 +5,6 @@ namespace Server.Repository.Interfaces
 {
     public interface IUserAuthRepo
     {
-        Task<TUser> GetCurrentUserAsync();
+        Task<TUser> GetCurrentUserAsync(string operation);
     }
 }

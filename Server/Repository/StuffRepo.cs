@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Server.DbModels;
 using Server.Models;
 using Server.Repository.Interfaces;
-using Server.ErrorHandling;
+using Server.Shared;
 
 namespace Server.Repository
 {
@@ -73,7 +73,7 @@ namespace Server.Repository
         {
             input.CheckDatum();
             TStuff dbStuff = input.ToCreate();
-            TUser dbUserAuth = await _userAuth.GetCurrentUserAsync();
+            TUser dbUserAuth = await _userAuth.GetCurrentUserAsync("created datum");
             TUser dbUser = await _context.TUser.FirstOrDefaultAsync(x => x.UsrId.Equals(dbUserAuth.UsrId));
             if (dbUser == null)
             { // Create and attach new user
@@ -117,7 +117,7 @@ namespace Server.Repository
                 throw new ArgumentException("Corrupted data.");
             }
 
-            TUser dbUserAuth = await _userAuth.GetCurrentUserAsync();
+            TUser dbUserAuth = await _userAuth.GetCurrentUserAsync("updated datum");
             TStuff dbStuff = await _context.TStuff.FirstOrDefaultAsync(x => x.StfId.Equals(stuffId));
             if (dbStuff == null || dbStuff.StfUserId != dbUserAuth.UsrId)
             {
@@ -135,7 +135,7 @@ namespace Server.Repository
 
         public async Task DeleteAsync(string stuffId)
         {
-            TUser dbUserAuth = await _userAuth.GetCurrentUserAsync();
+            TUser dbUserAuth = await _userAuth.GetCurrentUserAsync("deleted datum");
             TStuff dbStuff = await _context.TStuff.FirstOrDefaultAsync(x => x.StfId.Equals(stuffId));
             if (dbStuff == null || dbStuff.StfUserId != dbUserAuth.UsrId)
             {

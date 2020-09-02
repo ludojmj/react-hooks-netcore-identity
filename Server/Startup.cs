@@ -9,11 +9,13 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.ApplicationInsights;
 using Microsoft.OpenApi.Models;
-using Server.ErrorHandling;
 using Server.DbModels;
 using Server.Repository;
 using Server.Repository.Interfaces;
+using Server.Shared;
 
 namespace Server
 {
@@ -35,6 +37,13 @@ namespace Server
             services.AddCors();
             services.AddMemoryCache();
             services.AddHttpContextAccessor();
+            services.AddLogging(builder =>
+            {
+                builder.AddApplicationInsights(_conf["APPINSIGHTS_INSTRUMENTATIONKEY"]);
+                builder.AddFilter<ApplicationInsightsLoggerProvider>("", LogLevel.Trace);
+                builder.AddFilter<ApplicationInsightsLoggerProvider>("Microsoft", LogLevel.Error);
+            });
+            services.AddApplicationInsightsTelemetry();
 
             // Add DB
             services.AddDbContext<StuffDbContext>(options => options.UseSqlite(
@@ -52,6 +61,7 @@ namespace Server
 
             services.AddMvc(options =>
             {
+                options.Filters.Add(typeof(TraceHandler));
                 options.Filters.Add(typeof(ModelValidationFilter));
             }).SetCompatibilityVersion(CompatibilityVersion.Latest);
 

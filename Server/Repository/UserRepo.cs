@@ -90,7 +90,7 @@ namespace Server.Repository
                 throw new ArgumentException("Corrupted data.");
             }
 
-            TUser dbUserAuth = await _userAuth.GetCurrentUserAsync();
+            TUser dbUserAuth = await _userAuth.GetCurrentUserAsync("updated user");
             TUser dbUser = await _context.TUser.FirstOrDefaultAsync(x => x.UsrId.Equals(userId));
             if (dbUser == null || dbUser.UsrId != dbUserAuth.UsrId)
             {
@@ -105,7 +105,7 @@ namespace Server.Repository
 
         public async Task DeleteAsync(string userId)
         {
-            TUser dbUserAuth = await _userAuth.GetCurrentUserAsync();
+            TUser dbUserAuth = await _userAuth.GetCurrentUserAsync("deleted user");
             TUser dbUser = await _context.TUser.FirstOrDefaultAsync(x => x.UsrId.Equals(userId));
             if (dbUser == null || dbUser.UsrId != dbUserAuth.UsrId)
             {

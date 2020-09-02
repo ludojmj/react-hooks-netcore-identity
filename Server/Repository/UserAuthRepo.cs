@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using IdentityModel.Client;
 using Server.DbModels;
 using Server.Repository.Interfaces;
@@ -20,23 +21,26 @@ namespace Server.Repository
         private const string CstCachePrefix = "AUTH_";
         private readonly IConfiguration _conf;
         private readonly IMemoryCache _cache;
-
         private readonly IHttpContextAccessor _httpContext;
+        private readonly ILogger _logger;
 
-        public UserAuthRepo(IMemoryCache cache, IConfiguration conf, IHttpContextAccessor httpContext)
+        public UserAuthRepo(IMemoryCache cache, IConfiguration conf, IHttpContextAccessor httpContext, ILogger<UserAuthRepo> logger)
         {
             _cache = cache;
             _conf = conf;
             _httpContext = httpContext;
+            _logger = logger;
         }
 
-        public async Task<TUser> GetCurrentUserAsync()
+        public async Task<TUser> GetCurrentUserAsync(string operation)
         {
-            var token = await _httpContext.HttpContext.GetTokenAsync("access_token");
+            var access_token = await _httpContext.HttpContext.GetTokenAsync("access_token");
+            var id_token = await _httpContext.HttpContext.GetTokenAsync("id_token");
 
-            string cacheKey = $"{CstCachePrefix}{token}";
+            string cacheKey = $"{CstCachePrefix}{access_token}";
             if (_cache.TryGetValue(cacheKey, out TUser result))
             {
+                _logger.LogInformation($"{result.UsrName} has {operation} at {DateTime.Now}");
                 return result;
             }
 
@@ -46,7 +50,7 @@ namespace Server.Repository
                 var userInfo = await httpClient.GetUserInfoAsync(new UserInfoRequest
                 {
                     Address = _conf["JwtToken:UserInfoService"],
-                    Token = token
+                    Token = access_token
                 });
 
                 if (userInfo.IsError)
@@ -57,7 +61,7 @@ namespace Server.Repository
                 userClaimList = userInfo.Claims;
             }
 
-            JwtSecurityToken decodeSub = new JwtSecurityTokenHandler().ReadJwtToken(token);
+            JwtSecurityToken decodeSub = new JwtSecurityTokenHandler().ReadJwtToken(access_token);
             var claimList = userClaimList.ToList();
             result = new TUser
             {
@@ -68,8 +72,13 @@ namespace Server.Repository
                 UsrEmail = claimList.FirstOrDefault(x => x.Type == JwtRegisteredClaimNames.Email)?.Value
             };
 
-            var cacheEntryOptions = new MemoryCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromMinutes(50));
+            var cacheEntryOptions = new MemoryCacheEntryOptions
+            {
+                AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(50),
+            };
             _cache.Set(cacheKey, result, cacheEntryOptions);
+
+            _logger.LogInformation($"{result.UsrName} has {operation} at {DateTime.Now}");
             return result;
         }
     }

@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
-using Server.ErrorHandling;
+using Server.Shared;
 
 namespace Server.UnitTest.Filters
 {

@@ -2,7 +2,7 @@ using System;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc.Filters;
 
-namespace Server.ErrorHandling
+namespace Server.Shared
 {
     public class ModelValidationFilter : ActionFilterAttribute
     {

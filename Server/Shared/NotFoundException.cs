@@ -1,6 +1,6 @@
 using System;
 
-namespace Server.ErrorHandling
+namespace Server.Shared
 {
     public class NotFoundException : Exception
     {
