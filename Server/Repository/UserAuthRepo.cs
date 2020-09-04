@@ -34,10 +34,9 @@ namespace Server.Repository
 
         public async Task<TUser> GetCurrentUserAsync(string operation)
         {
-            var access_token = await _httpContext.HttpContext.GetTokenAsync("access_token");
-            var id_token = await _httpContext.HttpContext.GetTokenAsync("id_token");
+            var accessToken = await _httpContext.HttpContext.GetTokenAsync("access_token");
 
-            string cacheKey = $"{CstCachePrefix}{access_token}";
+            string cacheKey = $"{CstCachePrefix}{accessToken}";
             if (_cache.TryGetValue(cacheKey, out TUser result))
             {
                 _logger.LogInformation($"{result.UsrName} has {operation} at {DateTime.Now}");
@@ -50,7 +49,7 @@ namespace Server.Repository
                 var userInfo = await httpClient.GetUserInfoAsync(new UserInfoRequest
                 {
                     Address = _conf["JwtToken:UserInfoService"],
-                    Token = access_token
+                    Token = accessToken
                 });
 
                 if (userInfo.IsError)
@@ -61,7 +60,7 @@ namespace Server.Repository
                 userClaimList = userInfo.Claims;
             }
 
-            JwtSecurityToken decodeSub = new JwtSecurityTokenHandler().ReadJwtToken(access_token);
+            JwtSecurityToken decodeSub = new JwtSecurityTokenHandler().ReadJwtToken(accessToken);
             var claimList = userClaimList.ToList();
             result = new TUser
             {
