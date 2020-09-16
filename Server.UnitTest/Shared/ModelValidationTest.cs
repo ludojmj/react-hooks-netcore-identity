@@ -7,20 +7,19 @@ using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Routing;
-using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
 using Server.Shared;
 
-namespace Server.UnitTest.Filters
+namespace Server.UnitTest.Shared
 {
-    public class FilterTest
+    public class ModelValidationTest
     {
         [Fact]
-        public void ModelValidationFilter_ShouldThrowArgumentException_IfModelIsInvalid()
+        public void ModelValidationFilterAttribute_ShouldThrowArgumentException_IfModelIsInvalid()
         {
             // Arrange
-            var validationFilter = new ModelValidationFilter();
+            var validationFilter = new ModelValidationFilterAttribute();
             var modelState = new ModelStateDictionary();
             modelState.AddModelError("year", "invalid");
 
@@ -43,33 +42,6 @@ namespace Server.UnitTest.Filters
             // Assert
             Assert.IsType<ArgumentException>(exception);
             Assert.Equal("invalid", exception.Message);
-        }
-
-        [Fact]
-        public void ErrorHandlerFilter_ShouldThrowException_IfIForgotSomething()
-        {
-            // Arrange
-            var mockErrLogger = Mock.Of<ILogger<ErrorHandlerFilter>>();
-            var mockEnv = Mock.Of<IWebHostEnvironment>(x => x.ContentRootPath == string.Empty);
-            var errorFilter = new ErrorHandlerFilter(mockErrLogger, mockEnv);
-
-            var actionContext = new ActionContext(
-                Mock.Of<HttpContext>(),
-                Mock.Of<RouteData>(),
-                Mock.Of<ActionDescriptor>(),
-                Mock.Of<ModelStateDictionary>()
-            );
-
-            var exceptionContext = new ExceptionContext(actionContext, Mock.Of<List<IFilterMetadata>>())
-            {
-                Exception = Mock.Of<Exception>()
-            };
-
-            // Act
-            errorFilter.OnException(exceptionContext);
-
-            // Assert
-            Assert.IsType<BadRequestObjectResult>(exceptionContext.Result);
         }
     }
 }

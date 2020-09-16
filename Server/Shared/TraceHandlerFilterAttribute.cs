@@ -5,17 +5,24 @@ using Microsoft.Extensions.Logging;
 
 namespace Server.Shared
 {
-    public sealed class TraceHandler : ActionFilterAttribute
+    [System.AttributeUsage(System.AttributeTargets.Class, AllowMultiple = true)]
+    public sealed class TraceHandlerFilterAttribute : ActionFilterAttribute
     {
         private readonly ILogger _logger;
 
-        public TraceHandler(ILogger<TraceHandler> logger)
+        public TraceHandlerFilterAttribute(ILogger<TraceHandlerFilterAttribute> logger)
         {
             _logger = logger;
         }
 
         public override void OnActionExecuting(ActionExecutingContext context)
         {
+            if (context == null)
+            {
+                base.OnActionExecuting(null);
+                return;
+            }
+
             string operation = context.HttpContext.Request.Path.ToString();
             foreach (var elt in context.ActionArguments)
             {
@@ -28,6 +35,12 @@ namespace Server.Shared
 
         public override void OnActionExecuted(ActionExecutedContext context)
         {
+            if (context == null)
+            {
+                base.OnActionExecuted(null);
+                return;
+            }
+
             string operation = context.HttpContext.Request.Path.ToString();
             var result = context.Result;
             if (result is ObjectResult elt)

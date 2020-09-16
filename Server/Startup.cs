@@ -61,8 +61,8 @@ namespace Server
 
             services.AddMvc(options =>
             {
-                options.Filters.Add(typeof(TraceHandler));
-                options.Filters.Add(typeof(ModelValidationFilter));
+                options.Filters.Add(typeof(TraceHandlerFilterAttribute));
+                options.Filters.Add(typeof(ModelValidationFilterAttribute));
             }).SetCompatibilityVersion(CompatibilityVersion.Latest);
 
             services.Configure<ApiBehaviorOptions>(options =>
