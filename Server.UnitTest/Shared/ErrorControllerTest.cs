@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
 using Server.Shared;
@@ -16,12 +17,13 @@ namespace Server.UnitTest.Shared
         {
             // Arrange
             var mockEnv = Mock.Of<IWebHostEnvironment>();
+            var mockLog = Mock.Of<ILogger<ErrorController>>();
             var mockException = Mock.Of<IExceptionHandlerFeature>(x => x.Error == new NotFoundException("Not found"));
 
             var context = new DefaultHttpContext();
             context.Features.Set<IExceptionHandlerFeature>(mockException);
 
-            var controller = new ErrorController(mockEnv)
+            var controller = new ErrorController(mockEnv, mockLog)
             {
                 ControllerContext = new ControllerContext() { HttpContext = context }
             };
@@ -42,12 +44,13 @@ namespace Server.UnitTest.Shared
         {
             // Arrange
             var mockEnv = Mock.Of<IWebHostEnvironment>(x => x.EnvironmentName == "Development");
+            var mockLog = Mock.Of<ILogger<ErrorController>>();
             var mockException = Mock.Of<IExceptionHandlerFeature>(x => x.Error == new ArgumentException("Should be displayed"));
 
             var context = new DefaultHttpContext();
             context.Features.Set<IExceptionHandlerFeature>(mockException);
 
-            var controller = new ErrorController(mockEnv)
+            var controller = new ErrorController(mockEnv, mockLog)
             {
                 ControllerContext = new ControllerContext() { HttpContext = context }
             };
@@ -69,12 +72,13 @@ namespace Server.UnitTest.Shared
         {
             // Arrange
             var mockEnv = Mock.Of<IWebHostEnvironment>(x => x.EnvironmentName == "Production");
+            var mockLog = Mock.Of<ILogger<ErrorController>>();
             var mockException = Mock.Of<IExceptionHandlerFeature>(x => x.Error == new ArgumentException("Should not be displayed"));
 
             var context = new DefaultHttpContext();
             context.Features.Set<IExceptionHandlerFeature>(mockException);
 
-            var controller = new ErrorController(mockEnv)
+            var controller = new ErrorController(mockEnv, mockLog)
             {
                 ControllerContext = new ControllerContext() { HttpContext = context }
             };
