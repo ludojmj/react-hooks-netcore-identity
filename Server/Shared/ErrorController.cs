@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
 namespace Server.Shared
 {
@@ -10,10 +11,12 @@ namespace Server.Shared
     public class ErrorController : ControllerBase
     {
         private readonly IWebHostEnvironment _env;
+        private readonly ILogger _logger;
 
-        public ErrorController(IWebHostEnvironment env)
+        public ErrorController(IWebHostEnvironment env, ILogger<ErrorController> logger)
         {
             _env = env;
+            _logger = logger;
         }
 
         public IActionResult Error()
@@ -25,6 +28,7 @@ namespace Server.Shared
             }
 
             var exception = context.Error;
+            _logger.LogCritical(exception, "Error");
             var msg = exception.InnerException == null
                 ? exception.Message
                 : exception.InnerException.Message;
