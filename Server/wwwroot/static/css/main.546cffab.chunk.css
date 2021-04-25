@@ -1,1 +1,0 @@
-td,textarea{overflow:hidden}textarea{resize:none}@media screen and (max-width:1200px){.w60{width:100%}}@media screen and (max-width:576px){.table thead{display:none;border:none}.table td,.table tr{display:block}.table td{text-align:right;border:none}.table td:before{content:attr(data-label);float:left!important;font-weight:700}}

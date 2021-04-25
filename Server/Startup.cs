@@ -1,5 +1,5 @@
 using System;
-using System.IO;
+using System.Collections.Generic;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -48,7 +48,7 @@ namespace Server
             // Add DB
             services.AddDbContext<StuffDbContext>(options => options.UseSqlite(
                 _conf.GetConnectionString("SqlConnectionString"),
-                sqlServerOptions => sqlServerOptions.CommandTimeout(int.Parse(_conf.GetConnectionString("SqlCommandTimeout"))))
+                sqlServerOptions => sqlServerOptions.CommandTimeout(_conf.GetSection("ConnectionStrings:SqlCommandTimeout").Get<int>()))
             );
 
             // Add Authent
@@ -66,7 +66,7 @@ namespace Server
             }).SetCompatibilityVersion(CompatibilityVersion.Latest);
 
             services.Configure<ApiBehaviorOptions>(options =>
-            {   // Managed by Common/ModelValidationFilter.cs
+            {   // Managed by Shared/ModelValidationFilter.cs
                 options.SuppressModelStateInvalidFilter = true;
             });
 
@@ -81,7 +81,7 @@ namespace Server
             services.AddHttpsRedirection(options =>
             {
                 options.RedirectStatusCode = StatusCodes.Status308PermanentRedirect;
-                options.HttpsPort = 443;
+                options.HttpsPort = _conf.GetSection("https_port").Get<int>();
             });
 
             // Register the Swagger generator
@@ -92,7 +92,7 @@ namespace Server
                 {
                     Name = "Authorization",
                     Type = SecuritySchemeType.ApiKey,
-                    Scheme = "Bearer",
+                    Scheme = JwtBearerDefaults.AuthenticationScheme,
                     BearerFormat = "JWT",
                     In = ParameterLocation.Header,
                     Description = "JWT Authorization header using the Bearer scheme."
@@ -105,7 +105,7 @@ namespace Server
                             Reference = new OpenApiReference
                             {
                                 Type = ReferenceType.SecurityScheme,
-                                Id = "Bearer"
+                                Id = JwtBearerDefaults.AuthenticationScheme
                             }
                         },
                         new string[] {}
@@ -128,26 +128,13 @@ namespace Server
             }
             else
             {
-                var corsList = _conf["AuthCors"].Split(" ");
+                var corsList = _conf.GetSection("AuthCors").Get<string[]>();
                 app.UseCors(builder => builder
                     .WithOrigins(corsList)
                     .AllowAnyMethod()
                     .AllowAnyHeader()
                 );
             }
-
-            // React hosted by Web API ==> ignoring React for auth
-            // - /authentication/callback
-            // - /authentication/silent_callback
-            app.Use(async (context, next) =>
-            {
-                await next();
-                if (context.Response.StatusCode == 404 && !Path.HasExtension(context.Request.Path.Value))
-                {
-                    context.Request.Path = new PathString("/index.html");
-                    await next();
-                }
-            });
 
             app.UseFileServer(new FileServerOptions
             {
@@ -158,36 +145,30 @@ namespace Server
 
             if (!_env.IsProduction())
             {
-                app.UseSwagger();
+                app.UseSwagger(c =>
+                {
+                    c.PreSerializeFilters.Add((swagger, httpReq) =>
+                    {
+                        swagger.Servers = new List<OpenApiServer> { new OpenApiServer { Url = $"{httpReq.Scheme}://{httpReq.Host.Value}" } };
+                    });
+                });
                 app.UseSwaggerUI(c =>
                 {
                     c.SwaggerEndpoint("/swagger/v1/swagger.json", "Server V1");
                 });
             }
 
-            app.Use(async (context, next) =>
-            {
-                context.Response.Headers.Remove("Server");
-                context.Response.Headers.Remove("X-Powered-By");
-                context.Response.Headers.Remove("X-UA-Compatible");
-                context.Response.Headers.Add("X-UA-Compatible", "IE=Edge,chrome=1");
-                context.Response.Headers.Add("X-XSS-Protection", "1; mode=block");
-                context.Response.Headers.Add("Referrer-Policy", "no-referrer");
-                context.Response.Headers.Add("X-Content-Type-Options", "nosniff");
-                context.Response.Headers.Add("X-Frame-Options", "SAMEORIGIN");
-                context.Response.Headers.Add("Content-Security-Policy", "frame-ancestors 'self'");
-                await next();
-            });
-
             app.UseExceptionHandler("/api/Error");
             app.UseHsts();
             app.UseHttpsRedirection();
+            app.UseStaticFiles();
             app.UseRouting();
             app.UseAuthentication();
             app.UseAuthorization();
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers().RequireAuthorization();
+                endpoints.MapFallbackToFile("/index.html");
             });
         }
     }
