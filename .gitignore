@@ -457,3 +457,5 @@ $RECYCLE.BIN/
 # !.vscode/launch.json
 # !.vscode/extensions.json
 **/coverage.json
+
+**/.eslintcache

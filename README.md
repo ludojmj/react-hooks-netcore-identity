@@ -180,5 +180,6 @@ must be:
 
 **How to solve:**
 
-- ==> Add the Web.config file;
-- ==> The Web.config file is not needed on Linux.
+- ==> Add the web.config file since you've got IIS running;
+- ==> On Linux, the web.config file is useless
+(Update your http headers according to the suitable Web Server configuration file).
