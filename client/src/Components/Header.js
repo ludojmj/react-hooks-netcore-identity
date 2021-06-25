@@ -2,7 +2,7 @@ import React from 'react';
 import { AuthenticationContext } from '@axa-fr/react-oidc-context';
 import logo from './logo.svg';
 
-export default () => (
+const Header = () => (
   <AuthenticationContext.Consumer>
     {props => {
       return (
@@ -26,3 +26,5 @@ export default () => (
     }}
   </AuthenticationContext.Consumer>
 );
+
+export default Header;
